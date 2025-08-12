@@ -182,21 +182,28 @@
             background: rgba(0, 255, 65, 0.1);
         }
 
+        /* RESULTS: default is collapsed; when .show is added it expands smoothly, pushing content below */
         .results-container {
             width: 100%;
             max-width: 600px;
-            max-height: 500px;
-            overflow-y: auto;
-            border: 1px solid rgba(0, 255, 65, 0.2);
+            max-height: 0; /* collapsed */
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 65, 0.0);
             border-radius: 12px;
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(20px);
-            display: none;
-            animation: fadeInUp 0.4s ease-out;
+            transition: max-height 320ms cubic-bezier(.2,.8,.2,1), opacity 200ms ease, border-color 300ms ease, box-shadow 300ms ease, padding 300ms ease;
+            opacity: 0;
+            padding: 0; /* will animate to visible padding */
         }
 
+        /* expanded state: set a comfortable max-height large enough for results; will smoothly grow */
         .results-container.show {
-            display: block;
+            max-height: 520px; /* adjust if you want taller */
+            opacity: 1;
+            border-color: rgba(0, 255, 65, 0.2);
+            padding: 8px 0; /* keep small so item paddings control spacing */
+            box-shadow: 0 8px 30px rgba(0, 255, 65, 0.04);
         }
 
         .results-container::-webkit-scrollbar {
@@ -637,6 +644,7 @@
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
+            transition: margin-top 300ms ease; /* small transition in case layout shift */
         }
         
         .grid-item {
@@ -875,11 +883,12 @@
             <button class="toggle-btn" id="tvBtn">TV Shows</button>
         </div>
         
-        <!-- Top Rated Grid -->
-        <div class="top-grid" id="topGrid"></div>
-
+        <!-- RESULTS CONTAINER: moved ABOVE the grid so suggestions push the grid down -->
         <div class="results-container" id="resultsContainer">
         </div>
+
+        <!-- Top Rated Grid -->
+        <div class="top-grid" id="topGrid"></div>
 
         <div class="player-container" id="playerContainer">
             <div class="player-header">
@@ -1238,10 +1247,12 @@
             }
 
             showResults() {
+                // add .show to animate expansion (CSS handles smooth push)
                 this.resultsContainer.classList.add('show');
             }
 
             hideResults() {
+                // remove .show so it collapses smoothly
                 this.resultsContainer.classList.remove('show');
             }
 
